@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - main
+
+name: Prepare Staging
+jobs:
+  prep-staging:
+    name: Updating Staging Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up environment vars
+        run: |
+          source dev/image.env
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "BRANCH=release-staging-$IMAGE_TAG" >> $GITHUB_ENV
+          git config user.name Russ Parmer
+          git config user.email rparmer02@gmail.com
+      - name: Update npm package version
+        run: |
+          git checkout -b "$BRANCH"
+          cp dev/image.env staging/image.env
+          git add staging/image.env
+          git commit -m "Update staging image to $IMAGE_TAG"
+          git push -u origin 

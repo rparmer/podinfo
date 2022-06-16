@@ -21,7 +21,7 @@ jobs:
       - name: Update Staging Image Tag
         run: |
           git checkout -b "$BRANCH"
-          git pull
+          git branch --set-upstream-to=origin/$BRANCH $BRANCH
           cp dev/image.env staging/image.env
           git add staging/image.env
           git commit -m "Update staging image to $IMAGE_TAG"

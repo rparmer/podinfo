@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'staging/**'
+
+name: Prepare Prod
+jobs:
+  prep-staging:
+    name: Prepare Prod Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up environment vars
+        run: |
+          source staging/image.env
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "BRANCH=release-prod-$IMAGE_TAG" >> $GITHUB_ENV
+          git config user.name Russ Parmer
+          git config user.email rparmer02@gmail.com
+      - name: Update Prod Image Tag
+        run: |
+          git checkout -b "$BRANCH"
+          cp staging/image.env prod/image.env
+          git add prod/image.env
+          git commit -m "Update prod image to $IMAGE_TAG"
+          git push -u origin "$BRANCH"
+      - name: Create Pull Request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.pulls.create({
+              title: 'Update prod image tag to ${{ env.IMAGE_TAG }}',
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: '${{ env.BRANCH }}',
+              base: 'main'
+            });

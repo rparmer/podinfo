@@ -3,3 +3,21 @@ kind: Kustomization
 namespace: staging
 resources:
   - ../base
+configMapGenerator:
+  - name: podinfo-image-tag
+    envs:
+      - image.env
+replacements:
+  - source:
+      kind: ConfigMap
+      name: podinfo-image-tag
+      fieldPath: data.IMAGE_TAG
+    targets:
+      - select:
+          kind: Deployment
+          name: podinfo
+        fieldPaths:
+          - spec.template.spec.containers.[name=podinfod].image
+        options:
+          delimiter: ":"
+          index: 1

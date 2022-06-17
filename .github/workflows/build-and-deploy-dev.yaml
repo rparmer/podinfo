@@ -5,10 +5,6 @@ on:
     branches: [main]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-    # paths-ignore:
-    #   - 'dev/**'
-    #   - 'staging/**'
-    #   - 'prod/**'
   pull_request:
     branches: [main]
 
@@ -68,23 +64,17 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   kustomize:
+    if: ${{ github.event_name != 'pull_request' }}
     needs: [docker]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      # - name: Set up environment vars
-      #   run: |
-      #     # source dev/image.env
-      #     # echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-      #     # echo "BRANCH=release-staging-$IMAGE_TAG" >> $GITHUB_ENV
-      #     git config user.name Russ Parmer
-      #     git config user.email rparmer02@gmail.com
       - name: Generate base kustomization
         uses: karancode/kustomize-github-action@master
         with:
           kustomize_version: '4.5.5'
-          kustomize_build_dir: 'base'
+          kustomize_build_dir: 'app'
           kustomize_output_file: "app.yaml"
       - name: Upload app.yaml
         uses: actions/upload-artifact@v3
@@ -92,6 +82,7 @@ jobs:
           name: app
           path: app.yaml
   release-dev:
+    if: ${{ github.event_name != 'pull_request' }}
     needs: [docker, kustomize]
     runs-on: ubuntu-latest
     steps:
@@ -105,17 +96,12 @@ jobs:
           name: app
       - name: Set up environment vars
         run: |
-          # source dev/image.env
-          # echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          # echo "BRANCH=release-staging-$IMAGE_TAG" >> $GITHUB_ENV
           git config user.name Russ Parmer
           git config user.email rparmer02@gmail.com
-      - name: Update Staging Image Tag
+      - name: Update dev release
         run: |
-          # cp dev/image.env staging/image.env
-          # git add staging/image.env
           mv app.yaml dev/app.yaml
-          echo "IMAGE_TAG=${{ needs.docker.outputs.image_tag }}" > dev/image.env
+          echo "IMAGE=${{ needs.docker.outputs.image_tag }}" > dev/image.env
           git add dev/app.yaml dev/image.env
-          git commit -m "deploy new app to dev"
+          git commit -m "Release ${{ github.ref }} to dev"
           git push

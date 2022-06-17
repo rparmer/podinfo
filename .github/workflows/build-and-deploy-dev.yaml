@@ -1,4 +1,4 @@
-name: docker
+name: build-and-deploy-dev
 
 on:
   push:
@@ -61,6 +61,30 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  kustomize:
+    needs: [docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      # - name: Set up environment vars
+      #   run: |
+      #     # source dev/image.env
+      #     # echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+      #     # echo "BRANCH=release-staging-$IMAGE_TAG" >> $GITHUB_ENV
+      #     git config user.name Russ Parmer
+      #     git config user.email rparmer02@gmail.com
+      - name: Generate base kustomization
+        uses: karancode/kustomize-github-action@1.2.4
+        with:
+          kustomize_version: '4.5.5'
+          kustomize_build_dir: 'base'
+          kustomize_output_file: "app.yaml"
+      - name: Upload app.yaml
+        uses: actions/upload-artifact@v3
+        with:
+          name: app
+          path: app.yaml
   release-dev:
     needs: [docker]
     runs-on: ubuntu-latest
@@ -69,6 +93,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: release
+      - name: Download app.yaml
+        uses: actions/download-artifact@v3
+        with:
+          name: app
       - name: Set up environment vars
         run: |
           # source dev/image.env
@@ -80,7 +108,7 @@ jobs:
         run: |
           # cp dev/image.env staging/image.env
           # git add staging/image.env
-          touch testing.txt
-          git add testing.txt
-          git commit -m "testing"
+          mv app.yaml dev/app.yaml
+          git add dev/app.yaml
+          git commit -m "deploy new app to dev"
           git push

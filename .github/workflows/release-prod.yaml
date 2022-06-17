@@ -1,0 +1,43 @@
+name: release-prod
+
+on:
+  push:
+    branches: [release]
+    paths:
+      - 'staging/**'
+
+jobs:
+  release-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: release
+      - name: Set up environment vars
+        run: |
+          release=$(cat staging/release.txt)
+          echo "RELEASE=$release" >> $GITHUB_ENV
+          echo "BRANCH=release-prod-$release" >> $GITHUB_ENV
+          git config user.name Russ Parmer
+          git config user.email rparmer02@gmail.com
+      - name: Update Staging Image Tag
+        run: |
+          git checkout -b "$BRANCH"
+          cp staging/app.yaml prod/app.yaml
+          cp staging/image.env prod/image.env
+          cp staging/release.txt prod/release.txt
+          git add prod/app.yaml prod/image.env prod/release.txt
+          git commit -m "Release $RELEASE to prod"
+          git push -u origin "$BRANCH"
+      - name: Create Pull Request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.pulls.create({
+              title: 'Release ${{ env.RELEASE }} to prod',
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: '${{ env.BRANCH }}',
+              base: 'release'
+            });

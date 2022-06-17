@@ -67,6 +67,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: release
       - name: Set up environment vars
         run: |
           # source dev/image.env
@@ -76,7 +78,6 @@ jobs:
           git config user.email rparmer02@gmail.com
       - name: Update Staging Image Tag
         run: |
-          git checkout release
           # cp dev/image.env staging/image.env
           # git add staging/image.env
           touch testing.txt

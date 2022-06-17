@@ -4,20 +4,17 @@ namespace: dev
 resources:
   - app.yaml
 configMapGenerator:
-  - name: podinfo-image-tag
+  - name: podinfo-image
     envs:
       - image.env
 replacements:
   - source:
       kind: ConfigMap
-      name: podinfo-image-tag
-      fieldPath: data.IMAGE_TAG
+      name: podinfo-image
+      fieldPath: data.IMAGE
     targets:
       - select:
           kind: Deployment
           name: podinfo
         fieldPaths:
           - spec.template.spec.containers.[name=podinfod].image
-        options:
-          delimiter: ":"
-          index: 1

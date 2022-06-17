@@ -49,7 +49,7 @@ spec:
         - --level=info
         - --random-delay=false
         - --random-error=false
-        image: ghcr.io/rparmer/podinfo:main
+        image: ghcr.io/rparmer/podinfo:testing
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:

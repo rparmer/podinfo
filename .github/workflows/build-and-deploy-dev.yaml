@@ -103,5 +103,5 @@ jobs:
           mv app.yaml dev/app.yaml
           echo "IMAGE=${{ needs.docker.outputs.image_tag }}" > dev/image.env
           git add dev/app.yaml dev/image.env
-          git diff-index --quiet HEAD || git commit -m "Release ${{ github.ref }} to dev"
+          git diff-index --quiet HEAD || git commit -m "Release ${{ github.ref_name }} to dev"
           git push

@@ -5,10 +5,10 @@ on:
     branches: [main]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-    paths-ignore:
-      - 'dev/**'
-      - 'staging/**'
-      - 'prod/**'
+    # paths-ignore:
+    #   - 'dev/**'
+    #   - 'staging/**'
+    #   - 'prod/**'
   pull_request:
     branches: [main]
 
@@ -24,7 +24,9 @@ jobs:
     permissions:
       contents: read
       packages: write
-
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -50,6 +52,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -86,7 +90,7 @@ jobs:
           name: app
           path: app.yaml
   release-dev:
-    needs: [kustomize]
+    needs: [docker, kustomize]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -109,6 +113,7 @@ jobs:
           # cp dev/image.env staging/image.env
           # git add staging/image.env
           mv app.yaml dev/app.yaml
-          git add dev/app.yaml
+          echo "IMAGE_TAG=${{ needs.docker.outputs.image_tag }}" > dev/image.env
+          git add dev/app.yaml dev/image.env
           git commit -m "deploy new app to dev"
           git push

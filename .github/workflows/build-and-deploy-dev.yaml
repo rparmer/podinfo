@@ -75,7 +75,7 @@ jobs:
       #     git config user.name Russ Parmer
       #     git config user.email rparmer02@gmail.com
       - name: Generate base kustomization
-        uses: karancode/kustomize-github-action@1.2.4
+        uses: karancode/kustomize-github-action@master
         with:
           kustomize_version: '4.5.5'
           kustomize_build_dir: 'base'
@@ -86,7 +86,7 @@ jobs:
           name: app
           path: app.yaml
   release-dev:
-    needs: [docker]
+    needs: [kustomize]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

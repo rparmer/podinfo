@@ -1,11 +1,11 @@
-on:
-  workflow_run:
-    workflows:
-      - Docker
-    types:
-      - completed
+name: dev
 
-name: Prepare Staging
+on:
+  push:
+    branches: [release]
+    paths:
+      - 'dev/**'
+
 jobs:
   prep-staging:
     name: Prepare Staging Release

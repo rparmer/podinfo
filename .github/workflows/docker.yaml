@@ -2,11 +2,15 @@ name: docker
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
+    paths-ignore:
+      - 'dev/**'
+      - 'staging/**'
+      - 'prod/**'
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -15,7 +19,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -57,3 +61,23 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  release-dev:
+    needs: [docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up environment vars
+        run: |
+          source dev/image.env
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "BRANCH=release-staging-$IMAGE_TAG" >> $GITHUB_ENV
+          git config user.name Russ Parmer
+          git config user.email rparmer02@gmail.com
+      - name: Update Staging Image Tag
+        run: |
+          git checkout release
+          cp dev/image.env staging/image.env
+          git add staging/image.env
+          git commit -m "Update staging image to $IMAGE_TAG"
+          git push -u origin "$BRANCH"

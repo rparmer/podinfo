@@ -1,13 +1,13 @@
+name: staging
+
 on:
   push:
-    branches:
-      - main
+    branches: [release]
     paths:
       - 'staging/**'
 
-name: Prepare Prod
 jobs:
-  prep-staging:
+  prep-prod:
     name: Prepare Prod Release
     runs-on: ubuntu-latest
     steps:

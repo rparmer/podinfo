@@ -18,3 +18,11 @@ replacements:
           name: podinfo
         fieldPaths:
           - spec.template.spec.containers.[name=podinfod].image
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Always
+    target:
+      kind: Deployment
+      name: podinfo

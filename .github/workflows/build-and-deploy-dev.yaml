@@ -26,6 +26,7 @@ jobs:
       packages: write
     outputs:
       image_tag: ${{ steps.meta.outputs.tags }}
+      image_labels: ${{ steps.meta.outputs.labels }}
     
     steps:
       - name: Checkout repository
@@ -56,6 +57,8 @@ jobs:
             type=ref,event=branch
             type=ref,event=tag
             type=ref,event=pr
+          labels: |
+            appBuildTime={{date 'X'}}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -66,7 +69,6 @@ jobs:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
   kustomize:
     if: ${{ github.event_name != 'pull_request' }}
     needs: [docker]
@@ -107,6 +109,7 @@ jobs:
         run: |
           mv app.yaml dev/app.yaml
           echo "IMAGE=${{ needs.docker.outputs.image_tag }}" > dev/image.env
+          echo "IMAGE_LABELS=${{ needs.docker.outputs.image_labels }}" >> dev/image.env
           echo "$RELEASE" > dev/release.txt
           git add dev/app.yaml dev/image.env dev/release.txt
           git diff-index --quiet HEAD || git commit -m "Release $RELEASE to dev"

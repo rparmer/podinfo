@@ -27,7 +27,7 @@ replacements:
           kind: Deployment
           name: podinfo
         fieldPaths:
-          - spec.template.metadata.labels[image.build.date]
+          - spec.template.metadata.labels.[image.build.date]
         options:
           create: true
 patches:

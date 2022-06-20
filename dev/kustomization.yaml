@@ -21,13 +21,13 @@ replacements:
   - source:
       kind: ConfigMap
       name: podinfo-image
-      fieldPath: data.IMAGE_BUILD_DATE
+      fieldPath: data.IMAGE_TIMESTAMP
     targets:
       - select:
           kind: Deployment
           name: podinfo
         fieldPaths:
-          - spec.template.metadata.labels.[image.build.date]
+          - spec.template.metadata.labels.[image.timestamp]
         options:
           create: true
 patches:

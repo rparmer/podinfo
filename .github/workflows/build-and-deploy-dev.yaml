@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Get build date
         id: date
-        run: echo "::set-output name=timestamp::$(date +'%X')"
+        run: echo "::set-output name=timestamp::$(date +'%s')"
   docker:
     runs-on: ubuntu-latest
     permissions:

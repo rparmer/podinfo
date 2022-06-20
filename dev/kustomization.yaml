@@ -18,6 +18,18 @@ replacements:
           name: podinfo
         fieldPaths:
           - spec.template.spec.containers.[name=podinfod].image
+  - source:
+      kind: ConfigMap
+      name: podinfo-image
+      fieldPath: data.IMAGE_BUILD
+    targets:
+      - select:
+          kind: Deployment
+          name: podinfo
+        fieldPaths:
+          - spec.template.metadata.labels[image.build]
+        options:
+          create: true
 patches:
   - patch: |-
       - op: replace

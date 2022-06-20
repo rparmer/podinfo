@@ -28,7 +28,7 @@ jobs:
           cp dev/image.env staging/image.env
           cp dev/release.txt staging/release.txt
           git add staging/app.yaml staging/image.env staging/release.txt
-          git commit -m "Release $RELEASE to staging"
+          git diff-index --quiet HEAD || git commit -m "Release $RELEASE to staging"
           git push -u origin "$BRANCH"
       - name: Create Pull Request
         uses: actions/github-script@v6

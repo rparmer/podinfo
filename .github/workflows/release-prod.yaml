@@ -28,7 +28,7 @@ jobs:
           cp staging/image.env prod/image.env
           cp staging/release.txt prod/release.txt
           git add prod/app.yaml prod/image.env prod/release.txt
-          git commit -m "Release $RELEASE to prod"
+          git diff-index --quiet HEAD || git commit -m "Release $RELEASE to prod"
           git push -u origin "$BRANCH"
       - name: Create Pull Request
         uses: actions/github-script@v6

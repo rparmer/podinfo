@@ -1,6 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: podinfo
   name: podinfo
 spec:
   ports:
@@ -19,6 +21,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: podinfo
   name: podinfo
 spec:
   minReadySeconds: 3

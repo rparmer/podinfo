@@ -19,6 +19,14 @@ env:
   RELEASE: ${{ github.ref_name }}
 
 jobs:
+  build-date:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.date.outputs.date }}
+    steps:
+      - name: Get build date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H:%M:%S')"
   docker:
     runs-on: ubuntu-latest
     permissions:
@@ -88,7 +96,7 @@ jobs:
           path: app.yaml
   release-dev:
     if: ${{ github.event_name != 'pull_request' }}
-    needs: [docker, kustomize]
+    needs: [build-date, docker, kustomize]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -108,7 +116,7 @@ jobs:
         run: |
           mv app.yaml dev/app.yaml
           echo "IMAGE=${{ needs.docker.outputs.image_tag }}" > dev/image.env
-          echo "IMAGE_LABELS=${{ needs.docker.outputs.image_labels }}" >> dev/image.env
+          echo "IMAGE_BUILD_DATE=${{ needs.build-date.outputs.date }}" >> dev/image.env
           echo "$RELEASE" > dev/release.txt
           git add dev/app.yaml dev/image.env dev/release.txt
           git diff-index --quiet HEAD || git commit -m "Release $RELEASE to dev"

@@ -23,7 +23,7 @@ jobs:
   build-date:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.date.outputs.date }}
+      date: ${{ steps.date.outputs.date }}
     steps:
       - name: Get build date
         id: date

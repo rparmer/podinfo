@@ -22,6 +22,7 @@ jobs:
           git config user.name Russ Parmer
           git config user.email rparmer02@gmail.com
       - name: Update Staging Image Tag
+        if: $RELEASE =~ ^v[0-9]+.[0-9]+.[0-9]+
         run: |
           git checkout -b "$BRANCH"
           cp dev/app.yaml staging/app.yaml
@@ -30,6 +31,7 @@ jobs:
           git diff-index --quiet HEAD || git commit -m "Release $RELEASE to staging"
           git push -u origin "$BRANCH"
       - name: Create Pull Request
+        if: $RELEASE =~ ^v[0-9]+.[0-9]+.[0-9]+
         uses: actions/github-script@v6
         with:
           script: |

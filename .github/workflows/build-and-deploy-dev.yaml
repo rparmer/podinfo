@@ -33,10 +33,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
-      image_labels: ${{ steps.meta.outputs.labels }}
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

@@ -16,8 +16,8 @@ jobs:
           ref: release
       - name: Set up environment vars
         run: |
-          release=$(cat dev/release.txt)
-          echo "RELEASE=$release" >> $GITHUB_ENV
+          source dev/image.env
+          echo "RELEASE=$IMAGE_TAG" >> $GITHUB_ENV
           echo "BRANCH=release-staging-$release" >> $GITHUB_ENV
           git config user.name Russ Parmer
           git config user.email rparmer02@gmail.com
@@ -26,8 +26,7 @@ jobs:
           git checkout -b "$BRANCH"
           cp dev/app.yaml staging/app.yaml
           cp dev/image.env staging/image.env
-          cp dev/release.txt staging/release.txt
-          git add staging/app.yaml staging/image.env staging/release.txt
+          git add staging/app.yaml staging/image.env
           git diff-index --quiet HEAD || git commit -m "Release $RELEASE to staging"
           git push -u origin "$BRANCH"
       - name: Create Pull Request

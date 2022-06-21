@@ -11,10 +11,13 @@ replacements:
   - source:
       kind: ConfigMap
       name: podinfo-image
-      fieldPath: data.IMAGE
+      fieldPath: data.IMAGE_TAG
     targets:
       - select:
           kind: Deployment
           name: podinfo
         fieldPaths:
           - spec.template.spec.containers.[name=podinfod].image
+        options:
+          delimiter: ":"
+          index: 1

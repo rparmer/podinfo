@@ -97,7 +97,7 @@ jobs:
           path: app.yaml
   release-dev:
     if: ${{ github.event_name != 'pull_request' }}
-    needs: [build-date, docker, kustomize]
+    needs: [build-date, kustomize]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -116,9 +116,8 @@ jobs:
       - name: Release to dev
         run: |
           mv app.yaml dev/app.yaml
-          echo "IMAGE=${{ needs.docker.outputs.image_tag }}" > dev/image.env
+          echo "IMAGE_TAG=$RELEASE" > dev/image.env
           echo "IMAGE_TIMESTAMP=${{ needs.build-date.outputs.timestamp }}" >> dev/image.env
-          echo "$RELEASE" > dev/release.txt
-          git add dev/app.yaml dev/image.env dev/release.txt
+          git add dev/app.yaml dev/image.env
           git diff-index --quiet HEAD || git commit -m "Release $RELEASE to dev"
           git push

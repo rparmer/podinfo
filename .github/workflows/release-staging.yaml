@@ -1,7 +1,6 @@
 name: release-staging
 
 on:
-  workflow_dispatch:
   push:
     branches: [release]
     paths:

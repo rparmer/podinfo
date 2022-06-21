@@ -3,6 +3,13 @@
 ## Bootstrapping
 Follow the [fluxcd bootstap docs](https://fluxcd.io/docs/installation/#bootstrap) to install flux on your cluster
 
+## Cluster setup
+```
+kubectl create namespace dev
+kubectl create namespace staging
+kubectl create namespace prod
+```
+
 ## Source
 ```
 flux create source git podinfo \
@@ -39,4 +46,15 @@ flux create kustomization podinfo \
     --path="./prod" \
     --prune=true \
     --interval=1m
+```
+
+## Clean up
+```
+flux delete kustomization podinfo --namespace=dev --silent
+flux delete kustomization podinfo --namespace=staging --silent
+flux delete kustomization podinfo --namespace=prod --silent
+flux delete source git podinfo --silent
+kubectl delete namespace dev
+kubectl delete namespace staging
+kubectl delete namespace prod
 ```

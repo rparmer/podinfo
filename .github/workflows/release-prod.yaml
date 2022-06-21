@@ -18,11 +18,11 @@ jobs:
         run: |
           source staging/image.env
           echo "RELEASE=$IMAGE_TAG" >> $GITHUB_ENV
-          echo "BRANCH=release-prod-$release" >> $GITHUB_ENV
+          echo "BRANCH=release-prod-$IMAGE_TAG" >> $GITHUB_ENV
           git config user.name Russ Parmer
           git config user.email rparmer02@gmail.com
       - name: Update Staging Image Tag
-        if: $RELEASE =~ ^v[0-9]+.[0-9]+.[0-9]+
+        if: ${{ env.RELEASE }} =~ ^v[0-9]+.[0-9]+.[0-9]+
         run: |
           git checkout -b "$BRANCH"
           cp staging/app.yaml prod/app.yaml
@@ -31,7 +31,7 @@ jobs:
           git diff-index --quiet HEAD || git commit -m "Release $RELEASE to prod"
           git push -u origin "$BRANCH"
       - name: Create Pull Request
-        if: $RELEASE =~ ^v[0-9]+.[0-9]+.[0-9]+
+        if: ${{ env.RELEASE }} =~ ^v[0-9]+.[0-9]+.[0-9]+
         uses: actions/github-script@v6
         with:
           script: |

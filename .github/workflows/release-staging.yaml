@@ -18,7 +18,7 @@ jobs:
         run: |
           source dev/image.env
           echo "RELEASE=$IMAGE_TAG" >> $GITHUB_ENV
-          echo "BRANCH=release-staging-$release" >> $GITHUB_ENV
+          echo "BRANCH=release-staging-$IMAGE_TAG" >> $GITHUB_ENV
           git config user.name Russ Parmer
           git config user.email rparmer02@gmail.com
       - name: Update Staging Image Tag

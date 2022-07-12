@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: staging
 resources:
   - app.yaml
+  - ingress.yaml
 configMapGenerator:
   - name: podinfo-image
     envs:

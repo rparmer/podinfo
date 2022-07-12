@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: dev
 resources:
   - app.yaml
+  - ingress.yaml
 configMapGenerator:
   - name: podinfo-image
     envs:
